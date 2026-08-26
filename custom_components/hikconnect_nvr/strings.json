@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Enter the AppKey and SecretKey issued through Hikvision TPP. This integration connects directly to Hik-Connect; no separate Stream App is required.",
+        "data": {
+          "server_address": "Hikvision OpenAPI server address",
+          "app_key": "TPP AppKey",
+          "secret_key": "TPP SecretKey",
+          "stream_quality": "Camera stream"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect or authenticate with Hik-Connect. Check the TPP credentials and server address."
+    }
+  }
+}
