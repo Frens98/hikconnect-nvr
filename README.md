@@ -84,6 +84,37 @@ Use the normal Home Assistant camera cards. Set `camera_view: live` when you
 want continuous HLS video. Home Assistant's `auto` mode is its periodically
 refreshed thumbnail mode, rather than the live HLS player.
 
+## Smoother live playback (optional)
+
+This integration deliberately returns Hikvision's original HLS URL directly to
+Home Assistant. It is the smallest deployment and has no additional process to
+maintain, but some Hik-Connect feeds deliver each one-second HLS segment as a
+short burst. Depending on the network and Home Assistant stream worker, that
+can look like periodic stutter even when the camera itself is producing a
+steady frame rate.
+
+For installations where smooth live viewing matters more than the smallest
+possible latency, use a local relay such as go2rtc alongside Home Assistant:
+
+```text
+Hik-Connect HLS -> continuous ingest -> internal RTSP -> paced RTSP -> Home Assistant
+```
+
+The paced output should use FFmpeg's real-time input mode (`-re`) while copying
+the video stream. That releases frames at their original cadence without
+re-encoding or reducing image quality. Keep the HLS ingest and the paced output
+as two separate stages: applying `-re` directly to Hikvision's short HLS
+playlist can cause missed segments when the playlist rolls over.
+
+This adds a small independent buffer per camera (typically a few seconds), so
+the on-screen camera clocks need not match perfectly. It is an intentional
+smoothness/latency trade-off, not a synchronization error.
+
+The integration cannot safely enable this automatically: Hikvision stream URLs
+are temporary and a relay needs its own authenticated URL-refresh mechanism.
+For that reason this remains an optional deployment concern rather than a
+hidden proxy or extra service inside Home Assistant.
+
 ## Support and contributing
 
 Open an issue or pull request if you can help improve the integration. Please
